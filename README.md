@@ -338,7 +338,7 @@ Create a file named `.env` in the project root with the following keys:
 
 ```env
 # ── MongoDB ──────────────────────────────────────────────────
-MONGOOSE_URI=mongodb+srv://your-user:your-password@cluster.mongodb.net/reviewdrop
+MONGOOSE_URI=your mongodb uri
 
 # ── JWT (Admin Auth) ─────────────────────────────────────────
 JWT_SECRET=your_super_secret_jwt_key_make_it_long_and_random
