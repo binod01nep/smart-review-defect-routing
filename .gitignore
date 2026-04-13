@@ -1,0 +1,8 @@
+# Ignore environment file
+.env
+
+# Ignore specific JS file
+src/utils/slackChannels.js
+
+# Optional (recommended)
+node_modules/

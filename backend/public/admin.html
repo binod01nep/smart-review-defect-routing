@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewDrop — Admin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#0d0d0d;
+  --paper:#f5f2ec;
+  --paper2:#ede9e1;
+  --cream:#faf8f3;
+  --red:#e63222;
+  --red2:#ff4433;
+  --olive:#4a4a2a;
+  --stone:#8c8878;
+  --border:#d4cfc4;
+  --white:#ffffff;
+  --green:#2d7a2d;
+  --green-bg:#edf7ed;
+  --blue:#1a6a9a;
+  --blue-bg:#e8f4fb;
+  --font-head:'Syne',sans-serif;
+  --font-body:'Manrope',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.6;
+  min-height:100vh;
+}
+
+body::after{
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9999;
+}
+
+/* ── TOP BAR ── */
+.topbar{
+  position:fixed;
+  top:0;left:0;right:0;
+  height:56px;
+  background:var(--ink);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 32px;
+  z-index:100;
+}
+.topbar-brand{
+  font-family:var(--font-head);
+  font-size:20px;
+  font-weight:800;
+  color:var(--paper);
+  letter-spacing:-0.02em;
+  text-decoration:none;
+}
+.topbar-brand span{color:var(--red2)}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.topbar-tag{
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--stone);
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+}
+.back-btn{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--stone);
+  text-decoration:none;
+  padding:6px 14px;
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:4px;
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:6px;
+}
+.back-btn:hover{color:var(--paper);border-color:rgba(255,255,255,0.3)}
+
+/* ── PAGE ── */
+.page{
+  margin-top:56px;
+  padding:40px 48px 60px;
+  max-width:1400px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ── HERO ── */
+.dash-hero{
+  background:var(--ink);
+  border-radius:12px;
+  padding:36px 44px;
+  margin-bottom:36px;
+  position:relative;
+  overflow:hidden;
+}
+.dash-hero::before{
+  content:'';
+  position:absolute;
+  top:-80px;right:-80px;
+  width:260px;height:260px;
+  background:var(--red);
+  border-radius:50%;
+  opacity:0.1;
+}
+.dash-hero::after{
+  content:'';
+  position:absolute;
+  bottom:-60px;left:30%;
+  width:180px;height:180px;
+  background:var(--red2);
+  border-radius:50%;
+  opacity:0.06;
+}
+.hero-eyebrow{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.25em;
+  text-transform:uppercase;
+  color:rgba(245,242,236,0.4);
+  margin-bottom:8px;
+}
+.hero-title{
+  font-family:var(--font-head);
+  font-size:40px;
+  font-weight:800;
+  color:var(--paper);
+  line-height:1;
+  letter-spacing:-0.02em;
+  position:relative;
+  z-index:1;
+  margin-bottom:24px;
+}
+.hero-title span{color:var(--red2)}
+
+.stats-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:16px;
+  position:relative;
+  z-index:1;
+}
+.stat-box{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;
+  padding:16px 18px;
+}
+.stat-label{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:rgba(245,242,236,0.35);
+  margin-bottom:6px;
+}
+.stat-val{
+  font-family:var(--font-head);
+  font-size:28px;
+  font-weight:800;
+  color:var(--paper);
+  line-height:1;
+}
+.stat-val.pos{color:#6fcf6f}
+.stat-val.neg{color:var(--red2)}
+.stat-val.neu{color:#7fc8f0}
+
+/* ── CONTROLS ── */
+.controls{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+.filter-group{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.filter-btn{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  padding:6px 14px;
+  border-radius:100px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--stone);
+  cursor:pointer;
+  transition:all 0.15s;
+}
+.filter-btn:hover{border-color:var(--ink);color:var(--ink)}
+.filter-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.filter-btn.pos.active{background:var(--green);border-color:var(--green)}
+.filter-btn.neg.active{background:var(--red);border-color:var(--red)}
+.filter-btn.neu.active{background:var(--blue);border-color:var(--blue)}
+
+.search-wrap{
+  position:relative;
+  margin-left:auto;
+}
+.search-input{
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:8px 36px 8px 14px;
+  font-family:var(--font-body);
+  font-size:13px;
+  color:var(--ink);
+  outline:none;
+  width:220px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.search-input::placeholder{color:var(--stone)}
+.search-input:focus{border-color:var(--ink);box-shadow:0 0 0 3px rgba(13,13,13,0.08)}
+.search-icon{
+  position:absolute;
+  right:10px;top:50%;
+  transform:translateY(-50%);
+  color:var(--stone);
+  pointer-events:none;
+}
+
+.refresh-btn{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  padding:8px 16px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:var(--cream);
+  color:var(--ink);
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;gap:6px;
+}
+.refresh-btn:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.refresh-btn.spinning .ref-icon{animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TABLE ── */
+.table-wrap{
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.table-header{
+  display:grid;
+  grid-template-columns:1.8fr 1.2fr 0.9fr 0.9fr 1fr 1fr 0.8fr;
+  gap:0;
+  background:var(--paper2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+}
+.th{
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--stone);
+  padding:12px 10px;
+}
+
+.table-body{min-height:300px}
+
+.row{
+  display:grid;
+  grid-template-columns:1.8fr 1.2fr 0.9fr 0.9fr 1fr 1fr 0.8fr;
+  gap:0;
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  transition:background 0.15s;
+  cursor:pointer;
+}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--paper2)}
+
+.td{
+  padding:14px 10px;
+  font-size:13px;
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.td-text{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.td-email{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:var(--stone);
+}
+.td-product{font-weight:600;font-size:13px}
+.td-review{
+  font-size:12px;
+  color:var(--stone);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  display:block;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:3px 10px;
+  border-radius:100px;
+  font-family:var(--font-mono);
+  font-size:9px;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  font-weight:500;
+  white-space:nowrap;
+}
+.badge.positive{background:var(--green-bg);color:var(--green);border:1px solid #c5e0c5}
+.badge.negative{background:#fdf0ee;color:var(--red);border:1px solid #f0c8c3}
+.badge.neutral{background:var(--blue-bg);color:var(--blue);border:1px solid #b8ddf0}
+.badge.pending{background:#fef9e7;color:#a07d00;border:1px solid #f0d87c}
+.badge.in-progress{background:#e8f4fb;color:var(--blue);border:1px solid #b8ddf0}
+.badge.resolved{background:var(--green-bg);color:var(--green);border:1px solid #c5e0c5}
+.badge.def{background:var(--paper2);color:var(--stone);border:1px solid var(--border)}
+
+.td-date{
+  font-family:var(--font-mono);
+  font-size:10px;
+  color:var(--stone);
+}
+
+/* empty / loading state */
+.state-row{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:80px 40px;
+  gap:12px;
+  color:var(--stone);
+}
+.state-icon{font-size:48px;opacity:0.2}
+.state-text{
+  font-family:var(--font-head);
+  font-size:20px;
+  font-weight:700;
+  opacity:0.3;
+  color:var(--ink);
+}
+.state-sub{font-size:12px;font-family:var(--font-mono);letter-spacing:0.1em}
+
+/* loading dots */
+.loading-dots{display:flex;gap:6px;align-items:center}
+.loading-dots span{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--stone);
+  animation:ldot 1.2s ease-in-out infinite;
+  opacity:0.4;
+}
+.loading-dots span:nth-child(2){animation-delay:0.2s}
+.loading-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes ldot{0%,80%,100%{transform:scale(1);opacity:0.4}40%{transform:scale(1.5);opacity:1}}
+
+/* ── MODAL ── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(13,13,13,0.6);
+  backdrop-filter:blur(4px);
+  z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.25s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--cream);
+  border:1px solid var(--border);
+  border-radius:12px;
+  width:100%;
+  max-width:600px;
+  max-height:85vh;
+  overflow-y:auto;
+  transform:translateY(20px);
+  transition:transform 0.25s;
+}
+.modal-overlay.open .modal{transform:translateY(0)}
+.modal-top{
+  background:var(--ink);
+  padding:28px 32px;
+  position:relative;
+  overflow:hidden;
+  border-radius:10px 10px 0 0;
+}
+.modal-top::before{
+  content:'';
+  position:absolute;
+  top:-40px;right:-40px;
+  width:140px;height:140px;
+  background:var(--red);border-radius:50%;opacity:0.12;
+}
+.modal-product{
+  font-family:var(--font-head);
+  font-size:24px;
+  font-weight:800;
+  color:var(--paper);
+  position:relative;z-index:1;
+  margin-bottom:6px;
+}
+.modal-product span{color:var(--red2)}
+.modal-email{
+  font-family:var(--font-mono);
+  font-size:11px;
+  color:rgba(245,242,236,0.5);
+  position:relative;z-index:1;
+}
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  background:rgba(255,255,255,0.1);
+  border:none;border-radius:50%;
+  width:32px;height:32px;
+  color:var(--paper);
+  font-size:18px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;
+  z-index:1;
+}
+.modal-close:hover{background:rgba(255,255,255,0.2)}
+.modal-body{padding:28px 32px}
+.modal-section{margin-bottom:20px}
+.modal-label{
+  font-family:var(--font-mono);
+  font-size:9px;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--stone);margin-bottom:8px;
+}
+.modal-chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.modal-review-text{
+  background:var(--paper2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px 18px;
+  font-size:14px;
+  line-height:1.7;
+  color:var(--ink);
+}
+.modal-meta-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
+.modal-meta-item{
+  background:var(--paper2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:12px 14px;
+}
+
+/* ── PAGINATION ── */
+.pagination{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 24px;
+  border-top:1px solid var(--border);
+}
+.page-info{
+  font-family:var(--font-mono);
+  font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--stone);
+}
+.page-btns{display:flex;gap:6px}
+.page-btn{
+  font-family:var(--font-mono);font-size:11px;
+  padding:6px 14px;
+  border-radius:4px;border:1px solid var(--border);
+  background:var(--cream);color:var(--ink);
+  cursor:pointer;transition:all 0.15s;
+}
+.page-btn:hover:not(:disabled){background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.page-btn:disabled{opacity:0.35;cursor:not-allowed}
+.page-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* ── STATUS UPDATE ── */
+.status-select{
+  font-family:var(--font-mono);
+  font-size:10px;
+  letter-spacing:0.1em;
+  padding:4px 8px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  background:var(--cream);
+  color:var(--ink);
+  cursor:pointer;
+  outline:none;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .table-header,.row{grid-template-columns:1.5fr 1fr 0.8fr 0.8fr 1fr 0.7fr}
+  .th:nth-child(6),.td:nth-child(6){display:none}
+}
+@media(max-width:768px){
+  .page{padding:24px 16px 48px}
+  .dash-hero{padding:24px}
+  .stats-row{grid-template-columns:1fr 1fr}
+  .table-header,.row{grid-template-columns:1.4fr 1fr 0.8fr 0.8fr}
+  .th:nth-child(5),.td:nth-child(5),
+  .th:nth-child(6),.td:nth-child(6),
+  .th:nth-child(7),.td:nth-child(7){display:none}
+  .controls{flex-direction:column;align-items:flex-start}
+  .search-wrap{margin-left:0;width:100%}
+  .search-input{width:100%}
+  .modal-meta-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a href="index.html" class="topbar-brand">Review<span>Drop</span></a>
+  <div class="topbar-right">
+    <div class="topbar-tag">Admin Dashboard</div>
+    <a href="index.html" class="back-btn">← Back to App</a>
+    <button class="back-btn" onclick="logout()" style="border:1px solid rgba(230,50,34,0.4);color:#ff6b5b;cursor:pointer;background:none;">Logout →</button>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO + STATS -->
+  <div class="dash-hero">
+    <div class="hero-eyebrow">Overview</div>
+    <div class="hero-title">Review <span>Dashboard</span></div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-box"><div class="stat-label">Total Reviews</div><div class="stat-val" id="statTotal">—</div></div>
+      <div class="stat-box"><div class="stat-label">Positive</div><div class="stat-val pos" id="statPos">—</div></div>
+      <div class="stat-box"><div class="stat-label">Negative</div><div class="stat-val neg" id="statNeg">—</div></div>
+      <div class="stat-box"><div class="stat-label">Neutral</div><div class="stat-val neu" id="statNeu">—</div></div>
+      <div class="stat-box"><div class="stat-label">Pending</div><div class="stat-val" id="statPending">—</div></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <div class="filter-group">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn pos" data-filter="positive">Positive</button>
+      <button class="filter-btn neg" data-filter="negative">Negative</button>
+      <button class="filter-btn neu" data-filter="neutral">Neutral</button>
+    </div>
+    <div class="filter-group">
+      <button class="filter-btn" data-status="all">All Status</button>
+      <button class="filter-btn" data-status="pending">Pending</button>
+      <button class="filter-btn" data-status="in-progress">In Progress</button>
+      <button class="filter-btn" data-status="resolved">Resolved</button>
+    </div>
+    <button class="refresh-btn" id="refreshBtn">
+      <svg class="ref-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refresh
+    </button>
+    <div class="search-wrap">
+      <input class="search-input" id="searchInput" type="text" placeholder="Search reviews...">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <div class="table-header">
+      <div class="th">Product</div>
+      <div class="th">Email</div>
+      <div class="th">Sentiment</div>
+      <div class="th">Defect</div>
+      <div class="th">Routed To</div>
+      <div class="th">Status</div>
+      <div class="th">Date</div>
+    </div>
+    <div class="table-body" id="tableBody">
+      <div class="state-row">
+        <div class="loading-dots"><span></span><span></span><span></span></div>
+        <div class="state-text">Loading reviews…</div>
+      </div>
+    </div>
+    <div class="pagination" id="pagination" style="display:none">
+      <span class="page-info" id="pageInfo"></span>
+      <div class="page-btns" id="pageBtns"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-top">
+      <div class="modal-product" id="modalProduct">—</div>
+      <div class="modal-email" id="modalEmail">—</div>
+      <button class="modal-close" onclick="closeModalDirect()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-chips" id="modalChips"></div>
+      <div class="modal-section">
+        <div class="modal-label">Review Text</div>
+        <div class="modal-review-text" id="modalReview">—</div>
+      </div>
+      <div class="modal-section">
+        <div class="modal-label">Details</div>
+        <div class="modal-meta-grid">
+          <div class="modal-meta-item">
+            <div class="modal-label">Submitted</div>
+            <div id="modalDate" style="font-size:13px;font-weight:500">—</div>
+          </div>
+          <div class="modal-meta-item">
+            <div class="modal-label">Update Status</div>
+            <select class="status-select" id="modalStatusSelect" onchange="updateStatus()">
+              <option value="pending">Pending</option>
+              <option value="in-progress">In Progress</option>
+              <option value="resolved">Resolved</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'http://localhost:3000';
+const PER_PAGE = 15;
+
+// ── AUTH GUARD ──
+const adminToken = sessionStorage.getItem('adminToken');
+if (!adminToken) {
+  window.location.href = 'admin-login.html';
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` };
+}
+
+function logout() {
+  sessionStorage.removeItem('adminToken');
+  window.location.href = 'admin-login.html';
+}
+
+let allReviews = [];
+let filtered = [];
+let currentPage = 1;
+let activeSentiment = 'all';
+let activeStatus = 'all';
+let searchQuery = '';
+let currentReviewId = null;
+
+// ── FETCH ──
+async function fetchReviews(){
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  document.getElementById('tableBody').innerHTML = `
+    <div class="state-row">
+      <div class="loading-dots"><span></span><span></span><span></span></div>
+      <div class="state-text">Loading reviews…</div>
+    </div>`;
+  document.getElementById('pagination').style.display = 'none';
+
+  try{
+    const res = await fetch(`${API_BASE}/admin/reviews`, { headers: authHeaders() });
+    if(res.status === 401){ logout(); return; }
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    allReviews = data.reviews || data || [];
+    updateStats();
+    applyFilters();
+  } catch(err){
+    document.getElementById('tableBody').innerHTML = `
+      <div class="state-row">
+        <div class="state-icon">⚠️</div>
+        <div class="state-text">Could not load reviews</div>
+        <div class="state-sub">${err.message}</div>
+      </div>`;
+  } finally{
+    btn.classList.remove('spinning');
+  }
+}
+
+// ── STATS ──
+function updateStats(){
+  const pos = allReviews.filter(r => r.sentiment === 'positive').length;
+  const neg = allReviews.filter(r => r.sentiment === 'negative').length;
+  const neu = allReviews.filter(r => r.sentiment === 'neutral').length;
+  const pend = allReviews.filter(r => r.status === 'pending').length;
+  document.getElementById('statTotal').textContent = allReviews.length;
+  document.getElementById('statPos').textContent = pos;
+  document.getElementById('statNeg').textContent = neg;
+  document.getElementById('statNeu').textContent = neu;
+  document.getElementById('statPending').textContent = pend;
+}
+
+// ── FILTERS ──
+function applyFilters(){
+  filtered = allReviews.filter(r => {
+    const matchSent = activeSentiment === 'all' || r.sentiment === activeSentiment;
+    const matchStatus = activeStatus === 'all' || r.status === activeStatus;
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q ||
+      (r.productName||'').toLowerCase().includes(q) ||
+      (r.email||'').toLowerCase().includes(q) ||
+      (r.reviewText||'').toLowerCase().includes(q) ||
+      (r.defectType||'').toLowerCase().includes(q) ||
+      (r.routedTeam||'').toLowerCase().includes(q);
+    return matchSent && matchStatus && matchSearch;
+  });
+  currentPage = 1;
+  renderTable();
+}
+
+// ── RENDER TABLE ──
+function renderTable(){
+  const body = document.getElementById('tableBody');
+  const pag = document.getElementById('pagination');
+
+  if(filtered.length === 0){
+    body.innerHTML = `
+      <div class="state-row">
+        <div class="state-icon">📭</div>
+        <div class="state-text">No reviews found</div>
+        <div class="state-sub">Try adjusting your filters</div>
+      </div>`;
+    pag.style.display = 'none';
+    return;
+  }
+
+  const start = (currentPage - 1) * PER_PAGE;
+  const pageItems = filtered.slice(start, start + PER_PAGE);
+
+  body.innerHTML = pageItems.map(r => `
+    <div class="row" onclick="openModal('${r._id}')">
+      <div class="td"><span class="td-text td-product">${esc(r.productName||'—')}</span></div>
+      <div class="td"><span class="td-text td-email">${esc(r.email||'—')}</span></div>
+      <div class="td"><span class="badge ${r.sentiment||'def'}">${cap(r.sentiment||'—')}</span></div>
+      <div class="td"><span class="td-text" style="font-size:12px">${esc(r.defectType||'None')}</span></div>
+      <div class="td"><span class="td-text" style="font-size:12px">${esc(r.routedTeam||'Support')}</span></div>
+      <div class="td"><span class="badge ${(r.status||'pending').replace(/\s+/g,'-')}">${cap(r.status||'pending')}</span></div>
+      <div class="td td-date">${fmtDate(r.createdAt)}</div>
+    </div>
+  `).join('');
+
+  // pagination
+  const totalPages = Math.ceil(filtered.length / PER_PAGE);
+  pag.style.display = 'flex';
+  document.getElementById('pageInfo').textContent =
+    `${start+1}–${Math.min(start+PER_PAGE, filtered.length)} of ${filtered.length}`;
+
+  const pageBtns = document.getElementById('pageBtns');
+  pageBtns.innerHTML = '';
+
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'page-btn';
+  prevBtn.textContent = '← Prev';
+  prevBtn.disabled = currentPage === 1;
+  prevBtn.onclick = () => { currentPage--; renderTable(); };
+  pageBtns.appendChild(prevBtn);
+
+  // page number buttons (max 5)
+  const startPage = Math.max(1, currentPage - 2);
+  const endPage = Math.min(totalPages, startPage + 4);
+  for(let i = startPage; i <= endPage; i++){
+    const b = document.createElement('button');
+    b.className = 'page-btn' + (i === currentPage ? ' active' : '');
+    b.textContent = i;
+    b.onclick = (function(pg){ return () => { currentPage = pg; renderTable(); }; })(i);
+    pageBtns.appendChild(b);
+  }
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'page-btn';
+  nextBtn.textContent = 'Next →';
+  nextBtn.disabled = currentPage === totalPages;
+  nextBtn.onclick = () => { currentPage++; renderTable(); };
+  pageBtns.appendChild(nextBtn);
+}
+
+// ── MODAL ──
+function openModal(id){
+  const r = allReviews.find(x => x._id === id);
+  if(!r) return;
+  currentReviewId = id;
+
+  const parts = (r.productName||'').split(' ');
+  const last = parts.pop();
+  document.getElementById('modalProduct').innerHTML =
+    parts.join(' ') + ' <span>' + esc(last) + '</span>';
+  document.getElementById('modalEmail').textContent = r.email || '—';
+  document.getElementById('modalReview').textContent = r.reviewText || '—';
+  document.getElementById('modalDate').textContent = fmtDateLong(r.createdAt);
+
+  document.getElementById('modalChips').innerHTML = `
+    <span class="badge ${r.sentiment||'def'}">${cap(r.sentiment||'—')}</span>
+    <span class="badge def">${esc(r.defectType||'No defect')}</span>
+    <span class="badge def">→ ${esc(r.routedTeam||'Support')}</span>
+    <span class="badge ${(r.status||'pending').replace(/\s+/g,'-')}">${cap(r.status||'pending')}</span>
+  `;
+
+  const sel = document.getElementById('modalStatusSelect');
+  sel.value = r.status || 'pending';
+
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e){
+  if(e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  currentReviewId = null;
+}
+
+// ── STATUS UPDATE ──
+async function updateStatus(){
+  if(!currentReviewId) return;
+  const newStatus = document.getElementById('modalStatusSelect').value;
+  try{
+    const res = await fetch(`${API_BASE}/admin/reviews/${currentReviewId}/status`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ status: newStatus })
+    });
+    if(res.ok){
+      const idx = allReviews.findIndex(r => r._id === currentReviewId);
+      if(idx !== -1) allReviews[idx].status = newStatus;
+      updateStats();
+      applyFilters();
+      // update badge in modal
+      const chip = document.getElementById('modalChips');
+      const badges = chip.querySelectorAll('.badge');
+      if(badges[3]){
+        badges[3].className = `badge ${newStatus.replace(/\s+/g,'-')}`;
+        badges[3].textContent = cap(newStatus);
+      }
+    }
+  } catch(err){
+    console.error('Status update failed:', err.message);
+  }
+}
+
+// ── FILTER CONTROLS ──
+document.querySelectorAll('[data-filter]').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeSentiment = this.dataset.filter;
+    applyFilters();
+  });
+});
+
+document.querySelectorAll('[data-status]').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeStatus = this.dataset.status;
+    applyFilters();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', function(){
+  searchQuery = this.value;
+  applyFilters();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', fetchReviews);
+
+// ESC to close modal
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeModalDirect();
+});
+
+// ── HELPERS ──
+function esc(str){ return String(str).replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function cap(s){ return s ? s[0].toUpperCase() + s.slice(1) : s }
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDateLong(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+// ── INIT ──
+fetchReviews();
+</script>
+</body>
+</html>

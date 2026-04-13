@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ReviewDrop — Admin Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --ink:#0d0d0d;
+  --paper:#f5f2ec;
+  --red:#e63222;
+  --red2:#ff4433;
+  --stone:#8c8878;
+  --font-head:'Syne',sans-serif;
+  --font-body:'Manrope',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+
+html,body{height:100%}
+
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--font-body);
+  font-size:15px;line-height:1.6;
+  display:flex;flex-direction:column;
+  min-height:100vh;
+  position:relative;overflow:hidden;
+}
+
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;
+}
+
+.blob{position:fixed;border-radius:50%;pointer-events:none}
+.blob-1{width:500px;height:500px;top:-200px;right:-200px;background:radial-gradient(circle,rgba(230,50,34,0.15) 0%,transparent 70%)}
+.blob-2{width:400px;height:400px;bottom:-150px;left:-150px;background:radial-gradient(circle,rgba(255,68,51,0.1) 0%,transparent 70%)}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;
+}
+
+/* TOP BAR */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 32px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  z-index:100;backdrop-filter:blur(10px);
+}
+.topbar-brand{font-family:var(--font-head);font-size:20px;font-weight:800;color:var(--paper);letter-spacing:-0.02em;text-decoration:none}
+.topbar-brand span{color:var(--red2)}
+.topbar-tag{font-family:var(--font-mono);font-size:10px;color:rgba(245,242,236,0.25);letter-spacing:0.2em;text-transform:uppercase}
+
+/* MAIN */
+.center{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:80px 40px 40px;
+  position:relative;z-index:1;
+}
+
+/* SIDE BY SIDE */
+.layout{
+  width:100%;max-width:860px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:72px;
+  align-items:center;
+  animation:fadeUp 0.5s ease both;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* LEFT */
+.info-side{display:flex;flex-direction:column}
+
+.lock-wrap{
+  width:52px;height:52px;
+  background:rgba(230,50,34,0.12);
+  border:1px solid rgba(230,50,34,0.2);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:24px;
+  animation:lockpulse 2s ease-in-out infinite;
+}
+@keyframes lockpulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(230,50,34,0.2)}
+  50%{box-shadow:0 0 0 8px rgba(230,50,34,0)}
+}
+
+.card-eyebrow{
+  font-family:var(--font-mono);
+  font-size:10px;letter-spacing:0.3em;text-transform:uppercase;
+  color:rgba(245,242,236,0.3);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-eyebrow::before{content:'';width:20px;height:1px;background:var(--red);display:inline-block}
+
+.card-title{
+  font-family:var(--font-head);
+  font-size:52px;font-weight:800;
+  color:var(--paper);
+  line-height:1;letter-spacing:-0.03em;
+  margin-bottom:14px;
+}
+.card-title span{color:var(--red2)}
+
+.card-sub{
+  font-size:13px;color:rgba(245,242,236,0.4);
+  font-family:var(--font-mono);letter-spacing:0.05em;line-height:1.7;
+  margin-bottom:32px;
+}
+
+.info-divider{width:40px;height:2px;background:linear-gradient(90deg,var(--red),transparent);margin-bottom:24px}
+
+.info-note{
+  display:flex;align-items:flex-start;gap:10px;
+  font-size:12px;color:rgba(245,242,236,0.2);
+  font-family:var(--font-mono);letter-spacing:0.05em;line-height:1.6;
+}
+.info-note svg{flex-shrink:0;margin-top:2px;opacity:0.3}
+
+/* RIGHT: FORM */
+.form-side{display:flex;flex-direction:column}
+
+.form-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px;padding:32px;
+  backdrop-filter:blur(20px);
+}
+
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.field:last-of-type{margin-bottom:28px}
+
+.field label{font-family:var(--font-mono);font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:rgba(245,242,236,0.35)}
+.field label .req{color:var(--red2);margin-left:2px}
+
+.input-wrap{position:relative}
+
+.field input{
+  width:100%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:6px;padding:13px 44px 13px 16px;
+  font-family:var(--font-body);font-size:14px;color:var(--paper);outline:none;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+}
+.field input::placeholder{color:rgba(245,242,236,0.2)}
+.field input:focus{border-color:rgba(255,255,255,0.25);background:rgba(255,255,255,0.07);box-shadow:0 0 0 3px rgba(255,255,255,0.04)}
+.field input.invalid{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(230,50,34,0.12)!important}
+
+.eye-btn{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(245,242,236,0.3);
+  cursor:pointer;padding:0;display:flex;align-items:center;transition:color 0.2s;
+}
+.eye-btn:hover{color:rgba(245,242,236,0.7)}
+
+.btn-submit{
+  width:100%;padding:15px 32px;
+  background:var(--red);color:var(--paper);
+  border:none;border-radius:6px;
+  font-family:var(--font-head);font-size:16px;font-weight:700;letter-spacing:0.05em;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background 0.2s,transform 0.15s,box-shadow 0.2s;
+  position:relative;overflow:hidden;
+}
+.btn-submit::before{content:'';position:absolute;inset:0;background:rgba(255,255,255,0.1);transform:translateX(-100%);transition:transform 0.35s ease}
+.btn-submit:hover::before{transform:translateX(0)}
+.btn-submit:hover{box-shadow:0 8px 28px rgba(230,50,34,0.4);transform:translateY(-1px)}
+.btn-submit:active{transform:translateY(0)}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-submit span,.btn-submit svg{position:relative;z-index:1}
+
+.spinner{width:16px;height:16px;border:2px solid rgba(245,242,236,0.3);border-top-color:var(--paper);border-radius:50%;animation:spin 0.7s linear infinite;display:none;position:relative;z-index:1}
+.btn-submit.loading .spinner{display:block}
+.btn-submit.loading .btn-label,.btn-submit.loading .btn-arrow{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.error-box{
+  background:rgba(230,50,34,0.12);border:1px solid rgba(230,50,34,0.3);
+  border-radius:6px;padding:12px 16px;margin-bottom:20px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:0.08em;
+  color:#ff8070;display:none;align-items:center;gap:8px;
+}
+.error-box.visible{display:flex}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%,60%{transform:translateX(-6px)}
+  40%,80%{transform:translateX(6px)}
+}
+.form-card.shake{animation:shake 0.4s ease}
+
+.login-footer{
+  text-align:center;padding:24px;
+  font-family:var(--font-mono);font-size:9px;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:rgba(245,242,236,0.1);position:relative;z-index:1;
+}
+
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr;gap:32px;max-width:420px}
+  .card-title{font-size:38px}
+  .info-note{display:none}
+  .topbar{padding:0 20px}
+  .center{padding:72px 20px 32px}
+}
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<header class="topbar">
+  <a href="index.html" class="topbar-brand">Review<span>Drop</span></a>
+  <div class="topbar-tag">Restricted Access</div>
+</header>
+
+<div class="center">
+  <div class="layout">
+
+    <!-- LEFT: INFO -->
+    <div class="info-side">
+      <div class="lock-wrap">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff4433" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+      </div>
+      <div class="card-eyebrow">Admin Portal</div>
+      <div class="card-title">Sign <span>In</span></div>
+      <div class="card-sub">Restricted to authorized<br>personnel only</div>
+      <div class="info-divider"></div>
+      <div class="info-note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Unauthorized access attempts are logged and may result in account suspension.
+      </div>
+    </div>
+
+    <!-- RIGHT: FORM -->
+    <div class="form-side">
+      <div class="form-card" id="formCard">
+
+        <div class="error-box" id="errorBox">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="errorMsg">Invalid credentials</span>
+        </div>
+
+        <div class="field">
+          <label>Email <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="email" id="emailInput" placeholder="admin@example.com" autocomplete="email">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Password <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="password" id="passwordInput" placeholder="••••••••" autocomplete="current-password">
+            <button class="eye-btn" type="button" onclick="togglePassword()">
+              <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <button class="btn-submit" id="submitBtn" onclick="handleLogin()">
+          <span class="btn-label">Access Dashboard</span>
+          <span class="btn-arrow">→</span>
+          <div class="spinner"></div>
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="login-footer">ReviewDrop · Admin Access · Unauthorized access is prohibited</div>
+
+<script>
+const API_BASE = 'http://localhost:3000';
+
+if (sessionStorage.getItem('adminToken')) {
+  window.location.href = 'admin.html';
+}
+
+function togglePassword() {
+  const input = document.getElementById('passwordInput');
+  const icon = document.getElementById('eyeIcon');
+  if (input.type === 'password') {
+    input.type = 'text';
+    icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+function showError(msg) {
+  const box = document.getElementById('errorBox');
+  document.getElementById('errorMsg').textContent = msg;
+  box.classList.add('visible');
+  const card = document.getElementById('formCard');
+  card.classList.remove('shake');
+  void card.offsetWidth;
+  card.classList.add('shake');
+}
+
+function hideError() {
+  document.getElementById('errorBox').classList.remove('visible');
+}
+
+async function handleLogin() {
+  const email = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value;
+  hideError();
+
+  if (!email || !password) {
+    showError('Please enter both email and password.');
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch(`${API_BASE}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (res.ok && data.token) {
+      sessionStorage.setItem('adminToken', data.token);
+      window.location.href = 'admin.html';
+    } else {
+      showError(data.message || 'Invalid credentials. Try again.');
+      document.getElementById('passwordInput').value = '';
+    }
+  } catch (err) {
+    showError('Cannot connect to server. Is it running?');
+  } finally {
+    btn.disabled = false;
+    btn.classList.remove('loading');
+  }
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleLogin();
+});
+</script>
+</body>
+</html>
