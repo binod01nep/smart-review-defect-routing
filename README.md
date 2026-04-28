@@ -1,6 +1,6 @@
 # 
 <!-- ============================================================
-  📸  SCREENSHOTS — Replace these placeholders with your actual images
+  📸  SCREENSHOTS — Replace these placeholders with your actual image
   Recommended: 1280×800px, drag into GitHub to upload, then paste URL
   ============================================================ -->
 
